@@ -1,112 +1,89 @@
 class TicTacToe {
     constructor() {
 		this.count = 0;
+		this.player = 'x';
 		this.nLength = 3;
-		this.matrix = [['*', '*', '*'], ['*', '*', '*'], ['*', '*', '*']];
+		this.matrix = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
+		this.winner = null;
+		this.draw = false;
+		this.finished = false;
+		this.noTurns = false;
     }
 
     getCurrentPlayerSymbol() {
-		if (this.count % 2 == 0) {
-			return 'x';
-		} else {
-			return 'o';
-		}
+		return this.player;
     }
 
     nextTurn(rowIndex, columnIndex) {
-		//if (!this.isFinished) {
-			this.count++;
-			if (this.count % 2 == 0) {
-				this.matrix[rowIndex][columnIndex] = 'x';
-			} else {
-				this.matrix[rowIndex][columnIndex] = 'o';
-			}
-		//}
+	if(!this.getFieldValue(rowIndex,columnIndex)){
+            this.count++;
+            switch (this.getCurrentPlayerSymbol()){
+                case 'o':
+                    this.matrix[rowIndex][columnIndex] = -1;
+                    this.player = 'x';
+                    break;
+                case 'x':
+                    this.matrix[rowIndex][columnIndex] = 1;
+                    this.player = 'o';
+                    break;
+            }
+
+            this.checkWin(rowIndex, columnIndex);
+			this.noMoreTurns();
+            this.isDraw();
+        }
+    }
+	
+    checkWin(rowIndex,columnIndex){
+        var sumRow = 0;
+        var sumColumn = 0;
+        var sumDiagonal1 = 0;
+        var sumDiagonal2 = 0;
+        for (var i = 0; i < 3; i++) {
+            sumRow += this.matrix[rowIndex][i];
+            sumColumn += this.matrix[i][columnIndex];
+            sumDiagonal1 += this.matrix[i][i];
+            sumDiagonal2 += this.matrix[i][this.nLength - i + 1];
+        }
+
+        if (sumRow == -3 || sumColumn == -3 || sumDiagonal1 == -3 || sumDiagonal2 == -3){
+            this.winner = "o";
+            this.finished = true;
+        } else if (sumRow == 3 || sumColumn == 3 || sumDiagonal1 == 3 || sumDiagonal2 == 3 ){
+            this.winner = 'x';
+            this.finished = true;
+        }
     }
 
     isFinished() {
-		if (this.isDraw() || this.getWinner() == 'x' || this.getWinner() == 'o') {
+		if (this.noMoreTurns() || this.getWinner() || this.isDraw()) {
+			this.finished = true;
+		}
+		return this.finished;
+    }
+
+    getWinner() {
+		return this.winner;
+    }
+
+    noMoreTurns() {
+		if (this.count == 9) {
+			this.finished = true;
+			this.draw = true;
 			return true;
 		} else {
 			return false;
 		}
     }
 
-    getWinner() {
-		for (var i = 0; i < this.nLength; i++) {
-			var j = 0;
-			var oneX = 'x';
-			var twoO = 'o';
-			while (this.matrix[i][j] == oneX) {
-				j++;
-				if (j == this.nLength - 1) {
-					return oneX;
-				}
-			}
-			j = 0;
-			while (this.matrix[i][j] == twoO) {
-				j++;
-				if (j == this.nLength - 1) {
-					return twoO;
-				}
-			}
-			j = 0;
-			while (this.matrix[j][i] == oneX) {
-				j++;
-				if (j == this.nLength - 1) {
-					return oneX;
-				}
-			}
-			j = 0;
-			while (this.matrix[j][i] == twoO) {
-				j++;
-				if (j == this.nLength - 1) {
-					return twoO;
-				}
-			}
-			j = 0;
-			while (this.matrix[i][i] == oneX) {
-				j++;
-				if (j == this.nLength - 1) {
-					return oneX;
-				}
-			}
-			j = 0;
-			while (this.matrix[i][i] == twoO) {
-				j++;
-				if (j == this.nLength - 1) {
-					return twoO;
-				}
-			}
-		}
-		return null;
-    }
-
-    noMoreTurns() {
-		var num = 0;
-		for (var i = 0; i < this.nLength; i++) {
-			for (var j = 0; j < this.nLength; j++) {
-				if (this.matrix[i][j] == '*') {
-					return false;
-				}
-			}
-		}
-		return true;
-    }
-
     isDraw() {
-		if (this.noMoreTurns() && this.getWinner() == null) {
-			return true;
-		}
-		return false;
+		this.draw;
     }
 
     getFieldValue(rowIndex, colIndex) {
-		if (rowIndex > this.nLength ||colIndex > this.nLength || this.matrix[rowIndex][colIndex] == '*') {
-			return null;
-		} else {
-			return this.matrix[rowIndex][colIndex];
-		}
+		return this.matrix[rowIndex][colIndex]==1 ? 'x' 
+		: (this.matrix[rowIndex][colIndex]==-1?  'o'
+		: null) ;
     }
 }
 
